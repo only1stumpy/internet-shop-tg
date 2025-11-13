@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  telegramId String  @unique
+  username  String?
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+enum ProductCategory {
+  GAME
+  SERVICE
+}
+
+enum GameType {
+  MOBILE_LEGENDS
+  PUBG_MOBILE
+  FREE_FIRE
+  STEAM
+  OTHER
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  description String
+  category    ProductCategory
+  gameType    GameType?
+  image       String
+  basePrice   Float
+  currentPrice Float
+  discount    Int             @default(0)
+  currency    String          @default("₽")
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  orders      Order[]
+
+  @@map("products")
+}
+
+enum PaymentMethod {
+  APB_TRANSFER
+  CARD_TRANSFER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique
+  userId          String
+  productId       String
+  paymentMethod   PaymentMethod
+  paymentScreenshot String?
+  amount          Float
+  status          OrderStatus   @default(PENDING)
+  playerInfo      Json?
+  adminNote       String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  completedAt     DateTime?
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id])
+  review          Review?
+
+  @@map("orders")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  userId    String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}

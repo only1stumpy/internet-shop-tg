@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run:*)",
+      "Bash(curl:*)",
+      "Bash(if exist .next rmdir /s /q .next)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(.gitignore)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
