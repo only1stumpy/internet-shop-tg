@@ -8,7 +8,8 @@
       "Bash(find:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
