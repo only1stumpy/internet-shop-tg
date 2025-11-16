@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
       console.log("🔘 Callback data:", callbackData);
 
-      // Parse callback data: "complete_orderId" or "reject_orderId"
+      // Parse callback data: "confirm_orderId", "complete_orderId" or "reject_orderId"
       const [action, orderId] = callbackData.split("_");
 
       if (!orderId) {
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
         include: {
           user: true,
           product: true,
+          variant: true,
         },
       });
 
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
-      // Проверка что заказ еще не обработан
+      // Проверка что заказ еще не обработан окончательно
       if (order.status === "COMPLETED" || order.status === "REJECTED") {
         await bot.answerCallbackQuery(callbackQueryId, {
           text: "⚠️ Заказ уже обработан",
@@ -56,8 +57,51 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Order already processed" }, { status: 400 });
       }
 
-      // Обновить статус заказа в БД
-      if (action === "complete") {
+      // Обработка действий
+      if (action === "confirm") {
+        // PENDING -> PROCESSING (Подтвердить)
+        if (order.status !== "PENDING") {
+          await bot.answerCallbackQuery(callbackQueryId, {
+            text: "⚠️ Заказ уже подтвержден",
+            show_alert: true,
+          });
+          return NextResponse.json({ error: "Order already confirmed" }, { status: 400 });
+        }
+
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: "PROCESSING" },
+        });
+
+        // Обновить сообщение в Telegram
+        if (message) {
+          const caption = message.caption || message.text || "";
+          await updateOrderMessage(
+            message.chat.id.toString(),
+            message.message_id,
+            order.orderNumber,
+            "PROCESSING",
+            caption,
+            order
+          );
+        }
+
+        await bot.answerCallbackQuery(callbackQueryId, {
+          text: `⚙️ Заказ #${order.orderNumber} принят в обработку`,
+          show_alert: false,
+        });
+
+        console.log(`⚙️ Order ${order.orderNumber} confirmed by ${from.username || from.first_name}`);
+      } else if (action === "complete") {
+        // PROCESSING -> COMPLETED (Выполнено)
+        if (order.status !== "PROCESSING") {
+          await bot.answerCallbackQuery(callbackQueryId, {
+            text: "⚠️ Сначала подтвердите заказ",
+            show_alert: true,
+          });
+          return NextResponse.json({ error: "Order not in processing" }, { status: 400 });
+        }
+
         await prisma.order.update({
           where: { id: order.id },
           data: {
@@ -74,11 +118,11 @@ export async function POST(request: NextRequest) {
             message.message_id,
             order.orderNumber,
             "COMPLETED",
-            caption
+            caption,
+            order
           );
         }
 
-        // Отправить уведомление админу
         await bot.answerCallbackQuery(callbackQueryId, {
           text: `✅ Заказ #${order.orderNumber} выполнен`,
           show_alert: false,
@@ -86,11 +130,10 @@ export async function POST(request: NextRequest) {
 
         console.log(`✅ Order ${order.orderNumber} completed by ${from.username || from.first_name}`);
       } else if (action === "reject") {
+        // Отклонить заказ
         await prisma.order.update({
           where: { id: order.id },
-          data: {
-            status: "REJECTED",
-          },
+          data: { status: "REJECTED" },
         });
 
         // Обновить сообщение в Telegram
@@ -101,11 +144,11 @@ export async function POST(request: NextRequest) {
             message.message_id,
             order.orderNumber,
             "REJECTED",
-            caption
+            caption,
+            order
           );
         }
 
-        // Отправить уведомление админу
         await bot.answerCallbackQuery(callbackQueryId, {
           text: `❌ Заказ #${order.orderNumber} отклонен`,
           show_alert: false,

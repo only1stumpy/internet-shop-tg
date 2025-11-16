@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       include: {
         user: true,
         product: true,
+        variant: true,
         review: true,
       },
       orderBy: {

@@ -1,13 +1,24 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { Product } from "@prisma/client";
+import type { ProductWithVariants } from "@/types";
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductWithVariants;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const hasDiscount = product.discount > 0;
+  // Calculate min price and max discount from variants
+  const variants = product.variants || [];
+
+  const minPrice = variants.length > 0
+    ? Math.min(...variants.map(v => v.currentPrice))
+    : 0;
+
+  const maxDiscount = variants.length > 0
+    ? Math.max(...variants.map(v => v.discount))
+    : 0;
+
+  const hasDiscount = maxDiscount > 0;
 
   return (
     <Link
@@ -24,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             >
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
-            -{product.discount}%
+            до -{maxDiscount}%
           </div>
         )}
         <div className="p-4 flex items-center justify-center">
@@ -40,14 +51,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-3">
         <h3 className="text-white text-sm font-semibold mb-1">{product.name}</h3>
         <div className="flex items-center gap-2">
-          {hasDiscount && (
-            <span className="text-gray-400 line-through text-xs">
-              {product.basePrice} {product.currency}
+          {variants.length > 0 ? (
+            <span className="text-white font-bold">
+              от {minPrice} {product.currency}
             </span>
+          ) : (
+            <span className="text-gray-400 text-sm">Нет доступных вариантов</span>
           )}
-          <span className={`font-bold ${hasDiscount ? "text-red-500" : "text-white"}`}>
-            {product.currentPrice} {product.currency}
-          </span>
         </div>
       </div>
     </Link>

@@ -12,6 +12,12 @@ export async function GET(
     try {
       product = await prisma.product.findUnique({
         where: { id },
+        include: {
+          variants: {
+            where: { isActive: true },
+            orderBy: { sortOrder: "asc" },
+          },
+        },
       });
     } catch (dbError) {
       console.warn("Database not available, using mock data");

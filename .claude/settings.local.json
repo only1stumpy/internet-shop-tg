@@ -9,7 +9,16 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(.gitignore)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(bunx prisma migrate:*)",
+      "Bash(bunx prisma db push:*)",
+      "Bash(bunx prisma generate:*)",
+      "Bash(bunx tsx:*)",
+      "Bash(taskkill:*)",
+      "Bash(nul)",
+      "Bash(bunx --bun next dev)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(if not exist \"app\\api\\orders\\[id]\" mkdir \"app\\api\\orders\\[id]\")"
     ],
     "deny": [],
     "ask": []

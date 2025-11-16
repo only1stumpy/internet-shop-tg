@@ -13,7 +13,7 @@ export default function Header() {
           <h1 className="text-xl font-semibold">StarShop</h1>
         </Link>
         <div className="flex items-center gap-2">
-          <Link href="/cart">
+          <Link href="/admin">
             <MdOutlineShoppingCart className="w-6 h-6" />
           </Link>
           <Link href="/orders">

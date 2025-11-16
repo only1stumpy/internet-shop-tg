@@ -58,7 +58,7 @@ ${playerInfoText ? `\n📋 Данные игрока:\n${playerInfoText}` : ""}
         reply_markup: {
           inline_keyboard: [
             [
-              { text: "✅ Выполнить", callback_data: `complete_${order.orderId}` },
+              { text: "✅ Подтвердить", callback_data: `confirm_${order.orderId}` },
               { text: "❌ Отклонить", callback_data: `reject_${order.orderId}` },
             ],
           ],
@@ -70,7 +70,7 @@ ${playerInfoText ? `\n📋 Данные игрока:\n${playerInfoText}` : ""}
         reply_markup: {
           inline_keyboard: [
             [
-              { text: "✅ Выполнить", callback_data: `complete_${order.orderId}` },
+              { text: "✅ Подтвердить", callback_data: `confirm_${order.orderId}` },
               { text: "❌ Отклонить", callback_data: `reject_${order.orderId}` },
             ],
           ],
@@ -113,20 +113,42 @@ ${stars}
 }
 
 /**
- * Обновляет сообщение после обработки callback (Complete/Reject)
+ * Обновляет сообщение после обработки callback
  */
 export async function updateOrderMessage(
   chatId: string,
   messageId: number,
   orderNumber: string,
-  status: "COMPLETED" | "REJECTED",
-  originalCaption: string
+  status: "PROCESSING" | "COMPLETED" | "REJECTED",
+  originalCaption: string,
+  order?: any
 ) {
   const bot = getTelegramBot();
   if (!bot) return;
 
-  const statusEmoji = status === "COMPLETED" ? "✅" : "❌";
-  const statusText = status === "COMPLETED" ? "Выполнен" : "Отклонен";
+  let statusEmoji = "";
+  let statusText = "";
+  let buttons: any[][] = [];
+
+  if (status === "PROCESSING") {
+    statusEmoji = "⚙️";
+    statusText = "В обработке";
+    // Показать кнопки "Выполнено" и "Отклонить"
+    buttons = [
+      [
+        { text: "✅ Выполнено", callback_data: `complete_${order.id}` },
+        { text: "❌ Отклонить", callback_data: `reject_${order.id}` },
+      ],
+    ];
+  } else if (status === "COMPLETED") {
+    statusEmoji = "✅";
+    statusText = "Выполнен";
+    buttons = []; // Убираем кнопки
+  } else if (status === "REJECTED") {
+    statusEmoji = "❌";
+    statusText = "Отклонен";
+    buttons = []; // Убираем кнопки
+  }
 
   const updatedCaption = `${originalCaption}\n\n${statusEmoji} *Статус: ${statusText}*`;
 
@@ -135,7 +157,7 @@ export async function updateOrderMessage(
       chat_id: chatId,
       message_id: messageId,
       parse_mode: "Markdown",
-      reply_markup: { inline_keyboard: [] }, // Убираем кнопки
+      reply_markup: { inline_keyboard: buttons },
     });
   } catch (error) {
     console.error("Error updating order message:", error);
@@ -145,7 +167,7 @@ export async function updateOrderMessage(
         chat_id: chatId,
         message_id: messageId,
         parse_mode: "Markdown",
-        reply_markup: { inline_keyboard: [] },
+        reply_markup: { inline_keyboard: buttons },
       });
     } catch (fallbackError) {
       console.error("Fallback error updating message:", fallbackError);

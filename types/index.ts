@@ -1,10 +1,15 @@
-import { Product, Order, User, Review, OrderStatus, PaymentMethod } from "@prisma/client";
+import { Product, ProductVariant, Order, User, Review, OrderStatus, PaymentMethod } from "@prisma/client";
 
-export type { Product, Order, User, Review, OrderStatus, PaymentMethod };
+export type { Product, ProductVariant, Order, User, Review, OrderStatus, PaymentMethod };
+
+export interface ProductWithVariants extends Product {
+  variants: ProductVariant[];
+}
 
 export interface OrderWithDetails extends Order {
   user: User;
   product: Product;
+  variant?: ProductVariant | null;
   review?: Review | null;
 }
 
@@ -18,6 +23,7 @@ export interface UserWithOrders extends User {
 
 export interface CreateOrderInput {
   productId: string;
+  variantId: string;
   paymentMethod: PaymentMethod;
   playerInfo?: Record<string, any>;
 }
@@ -25,6 +31,14 @@ export interface CreateOrderInput {
 export interface UpdateProductInput {
   name?: string;
   description?: string;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateVariantInput {
+  name?: string;
+  description?: string;
+  basePrice?: number;
   currentPrice?: number;
   discount?: number;
   isActive?: boolean;

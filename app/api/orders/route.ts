@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
       where: { userId },
       include: {
         product: true,
+        variant: true,
         review: true,
       },
       orderBy: {
@@ -32,15 +33,24 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, productId, paymentMethod, playerInfo, paymentScreenshot } = body;
+    const { userId, productId, variantId, paymentMethod, playerInfo, paymentScreenshot } = body;
 
-    // Get product to calculate amount
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
+    // Validate variant and get price
+    if (!variantId) {
+      return NextResponse.json({ error: "Variant ID is required" }, { status: 400 });
+    }
+
+    const variant = await prisma.productVariant.findUnique({
+      where: { id: variantId },
+      include: { product: true },
     });
 
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    if (!variant) {
+      return NextResponse.json({ error: "Product variant not found" }, { status: 404 });
+    }
+
+    if (variant.productId !== productId) {
+      return NextResponse.json({ error: "Variant does not belong to this product" }, { status: 400 });
     }
 
     // Generate order number
@@ -52,14 +62,16 @@ export async function POST(request: NextRequest) {
         orderNumber,
         userId,
         productId,
+        variantId,
         paymentMethod,
         playerInfo,
         paymentScreenshot,
-        amount: product.currentPrice,
-        status: paymentScreenshot ? "PAID" : "PENDING",
+        amount: variant.currentPrice,
+        status: "PENDING", // Всегда начинаем с PENDING, админ подтверждает
       },
       include: {
         product: true,
+        variant: true,
         user: true,
       },
     });
@@ -70,7 +82,7 @@ export async function POST(request: NextRequest) {
         orderId: order.id,
         orderNumber: order.orderNumber,
         username: order.user.username || "Unknown",
-        productName: order.product.name,
+        productName: `${order.product.name} - ${variant.name}`,
         amount: order.amount,
         paymentMethod: order.paymentMethod,
         screenshotUrl: paymentScreenshot,
