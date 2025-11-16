@@ -178,7 +178,7 @@ export default function AdminPage() {
     type = "text",
   }: {
     product: ProductWithVariants;
-    field: keyof ProductWithVariants;
+    field: "name" | "description" | "image" | "isActive" | "sortOrder" | "currency";
     type?: "text" | "number" | "checkbox";
   }) => {
     const isEditing =
@@ -188,7 +188,7 @@ export default function AdminPage() {
     const [value, setValue] = useState(product[field]);
 
     const handleSave = () => {
-      handleProductEdit(product.id, field, value);
+      handleProductEdit(product.id, field, value as string | number | boolean);
     };
 
     if (type === "checkbox") {
@@ -237,7 +237,7 @@ export default function AdminPage() {
     type = "text",
   }: {
     variant: ProductVariant;
-    field: keyof ProductVariant;
+    field: "name" | "image" | "basePrice" | "currentPrice" | "discount" | "sortOrder" | "isActive";
     type?: "text" | "number" | "checkbox";
   }) => {
     const isEditing =
@@ -247,7 +247,7 @@ export default function AdminPage() {
     const [value, setValue] = useState(variant[field]);
 
     const handleSave = () => {
-      handleVariantEdit(variant.id, field, value);
+      handleVariantEdit(variant.id, field, value as string | number | boolean);
     };
 
     if (type === "checkbox") {

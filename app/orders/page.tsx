@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTelegramUser } from "@/lib/hooks/useTelegramUser";
-import type { Order, Product } from "@prisma/client";
+import type { Order, Product, Review } from "@prisma/client";
 
 interface OrderWithProduct extends Order {
   product: Product;
+  review?: Review | null;
 }
 
 export default function OrdersPage() {

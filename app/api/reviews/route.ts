@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("productId");
 
-    let reviews;
+    let reviews: any[];
     try {
       reviews = await prisma.review.findMany({
         where: productId

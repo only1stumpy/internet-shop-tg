@@ -219,11 +219,6 @@ export default function ProductPage() {
                       )}
                       <div className="flex-1">
                         <div className="text-white font-semibold">{variant.name}</div>
-                        {variant.description && (
-                          <div className="text-gray-300 text-sm mt-1">
-                            {variant.description}
-                          </div>
-                        )}
                       </div>
                       <div className="text-right ml-4">
                         {hasDiscount && (

@@ -18,7 +18,11 @@
       "Bash(nul)",
       "Bash(bunx --bun next dev)",
       "Bash(timeout /t 5 /nobreak)",
-      "Bash(if not exist \"app\\api\\orders\\[id]\" mkdir \"app\\api\\orders\\[id]\")"
+      "Bash(if not exist \"app\\api\\orders\\[id]\" mkdir \"app\\api\\orders\\[id]\")",
+      "Bash(vercel logs:*)",
+      "Bash(vercel ls)",
+      "Bash(vercel inspect:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

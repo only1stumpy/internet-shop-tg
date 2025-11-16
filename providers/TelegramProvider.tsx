@@ -25,10 +25,6 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
       console.log("🔍 InitDataUnsafe:", webApp.initDataUnsafe);
       console.log("🔍 User data:", webApp.initDataUnsafe?.user);
 
-      // Set theme colors
-      webApp.setHeaderColor("#001f54");
-      webApp.setBackgroundColor("#0a1128");
-
       // Try to get user from initDataUnsafe if initData is empty
       const user = webApp.initDataUnsafe?.user;
       if (user) {

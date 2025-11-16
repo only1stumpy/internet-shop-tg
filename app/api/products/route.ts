@@ -6,7 +6,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
-    const gameType = searchParams.get("gameType");
 
     // Try to use database first, fallback to mock data
     let products;
@@ -15,7 +14,6 @@ export async function GET(request: NextRequest) {
         where: {
           isActive: true,
           ...(category && { category: category as any }),
-          ...(gameType && { gameType: gameType as any }),
         },
         include: {
           variants: {
@@ -31,7 +29,6 @@ export async function GET(request: NextRequest) {
       console.warn("Database not available, using mock data");
       products = mockProducts.filter((p) => {
         if (category && p.category !== category) return false;
-        if (gameType && p.gameType !== gameType) return false;
         return p.isActive;
       });
     }
