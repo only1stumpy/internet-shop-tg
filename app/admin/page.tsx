@@ -413,6 +413,9 @@ export default function AdminPage() {
                           <thead className="bg-[--header]">
                             <tr className="text-left">
                               <th className="p-3 text-white font-semibold whitespace-nowrap">
+                                Изображение
+                              </th>
+                              <th className="p-3 text-white font-semibold whitespace-nowrap">
                                 Название
                               </th>
                               <th className="p-3 text-white font-semibold whitespace-nowrap">
@@ -441,6 +444,9 @@ export default function AdminPage() {
                                 key={variant.id}
                                 className="border-t border-gray-700 hover:bg-[--header]/50"
                               >
+                                <td className="p-3 text-white">
+                                  <EditableVariantCell variant={variant} field="image" />
+                                </td>
                                 <td className="p-3 text-white">
                                   <EditableVariantCell variant={variant} field="name" />
                                 </td>
@@ -747,6 +753,7 @@ function AddVariantModal({
 }) {
   const [formData, setFormData] = useState({
     name: "",
+    image: "https://placehold.co/144x144/1a2444/fefcfb?text=Variant",
     basePrice: 0,
     currentPrice: 0,
   });
@@ -813,6 +820,17 @@ function AddVariantModal({
                 required
                 className="w-full bg-[--search] text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[--indigo-dye]"
                 placeholder="Например: 100 + 10 алмазов 💎"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white mb-2 text-sm">URL изображения</label>
+              <input
+                type="url"
+                value={formData.image}
+                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                className="w-full bg-[--search] text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[--indigo-dye]"
+                placeholder="https://example.com/image.png"
               />
             </div>
 

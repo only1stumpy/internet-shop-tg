@@ -45,3 +45,4 @@ next-env.d.ts
 prisma/seed.ts
 
 .vercel
+.env*.local

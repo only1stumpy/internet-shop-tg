@@ -38,6 +38,7 @@ export interface UpdateProductInput {
 export interface UpdateVariantInput {
   name?: string;
   description?: string;
+  image?: string;
   basePrice?: number;
   currentPrice?: number;
   discount?: number;

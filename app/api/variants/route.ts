@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("💎 Request body:", JSON.stringify(body, null, 2));
 
-    const { productId, name, basePrice, currentPrice } = body;
+    const { productId, name, image, basePrice, currentPrice } = body;
 
     if (!productId || !name || basePrice === undefined || currentPrice === undefined) {
       console.error("❌ Missing required fields");
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     const variantData = {
       productId,
       name,
+      ...(image && { image }),
       basePrice,
       currentPrice,
       discount,

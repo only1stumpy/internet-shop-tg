@@ -205,7 +205,18 @@ export default function ProductPage() {
                         : "bg-[--search] border-transparent hover:bg-[--indigo-dye]/20 hover:border-[--indigo-dye]"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
+                      {variant.image && (
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={variant.image}
+                            alt={variant.name}
+                            width={60}
+                            height={60}
+                            className="rounded-lg"
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <div className="text-white font-semibold">{variant.name}</div>
                         {variant.description && (
