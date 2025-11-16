@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "bunx --bun next dev",
-    "build": "bunx prisma generate && bunx --bun next build",
-    "start": "bunx --bun next start",
+    "build": "prisma generate && prisma db push && npm run seed:conditional && next build",
+    "start": "next start",
     "lint": "eslint",
-    "seed": "bunx tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "seed:conditional": "node -e \"if (process.env.SEED_DATABASE === 'true') { require('child_process').execSync('npm run seed', {stdio: 'inherit'}); }\""
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
